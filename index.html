@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="style.css" rel="stylesheet" />
+</head>
+<body>
+
+<h1>Lottery Simulator</h1>
+<h2>- How to play -</h2>
+<p>Click the "Enter" button and enter the winning lottery number and <br>
+the winning lucky ball number. Then, click the "Generate" button to<br>
+generate a random set of lottery numbers and a random lucky ball <br>
+number. The simulator will then calculate how much your randomly generated 
+lottery ticket would earn you!<br>
+</p>
+
+<button onclick="generate_nums()">Generate</button>
+<button onclick="enter_winning_nums()">Enter</button>
+
+<p id="winning_nums"></p>
+<p id="winning_lucky_ball"></p>
+
+<p id="generated_nums"></p>
+<p id="generated_lucky_ball"></p>
+
+<p id="generated_nums_sorted"></p>
+<p id="generated_lucky_ball_sorted"></p>
+
+<p id="num_matches"></p>
+<p id="lucky_ball_match"></p>
+
+<h3 id="payout"></h3>
+
+</body>
+
+
+
+
+<script language="javascript">
+
+var winning_nums = [];
+var winning_lucky = 0;
+
+/*
+* [enter_winning_nums]
+* Purpose: request and store winning lottery numvers   
+*/
+function enter_winning_nums() {
+
+    winning_nums = prompt("Please enter the winning numbers", "5 11 24 42 43").split(" ", 5);
+    winning_lucky = prompt("Please enter your lucky ball number", "3");
+
+    /* sort numbers in array */
+    winning_nums.sort(function(a, b) { return a - b});
+
+    document.getElementById("winning_nums").innerHTML = "Winning numbers sorted: " + winning_nums.join(" - ");
+    document.getElementById("winning_lucky_ball").innerHTML = "Lucky ball: " + winning_lucky;
+
+}
+
+/*
+* [generate_nums]
+* Purpose: generate numbers and run the rest of the simulation  
+*/
+function generate_nums() {
+
+    var generated_nums = [];
+    var generated_lucky = 0;
+    var num_matches = 0;
+    var lucky_ball_match = false;
+    var payout = 0;
+
+    for (i = 0; i < 5; i++) {
+        var add = true;
+        var temp = Math.floor(Math.random() * (48 - 1) + 1);
+        var generated_lucky = Math.floor(Math.random() * (18 - 1) + 1);
+
+        /* make sure number is not already in array */
+        for (var j = 0; j < i; j++) { 
+            if (generated_nums[j] == temp) {
+            add = false; 
+            }
+        }
+        /* if number is unique, add to array */
+        if (add) {
+            generated_nums.push(temp);
+        } else {
+            i--;
+        }
+    }
+
+    /* print non-sorted generated numbers */
+    document.getElementById("generated_nums").innerHTML = "Random pick: " + generated_nums.join(" - ");
+    document.getElementById("generated_lucky_ball").innerHTML = "Radom lucky ball: " + generated_lucky;
+
+    /* sort numbers in array */
+    generated_nums.sort(function(a, b) { return a - b});
+
+    /* print sorted generated numbers */
+    document.getElementById("generated_nums_sorted").innerHTML = "Random pick sorted: " + generated_nums.join(" - ");
+    document.getElementById("generated_lucky_ball_sorted").innerHTML = "Radom lucky ball: " + generated_lucky;
+
+
+    /* determine whether lucky ball numbers match */
+    if (winning_lucky == generated_lucky) {
+        lucky_ball_match = true;
+        document.getElementById("lucky_ball_match").innerHTML = "Lucky ball match: YES";
+    } else {
+        document.getElementById("lucky_ball_match").innerHTML = "Lucky ball match: NO";
+    }
+
+    num_matches = find_matches(winning_nums, generated_nums, num_matches);
+
+    calculate_payout(payout, num_matches, lucky_ball_match); 
+
+    document.getElementById("num_matches").innerHTML = "Number of matches: " + num_matches;
+}
+
+/*
+* [find_matches]
+* Purpose: count the number of matches between winning and randomly generated 
+* sets of numbers 
+*/
+function find_matches(array1, array2, num_matches) {
+    for (i = 0; i < 5; i++) {
+        for (var j = 0; j < 5; j++) {
+
+            if (array1[i] == array2[j]) {
+                num_matches++;
+            }
+        }
+    }
+    return num_matches;
+}
+
+/* 
+* [calculate_payout]
+* Purpose: calculates payout and prints it to page
+*/
+function calculate_payout(payout, num_matches, lucky_ball_match) {
+    
+    /* calculate the payout */
+    if (num_matches == 0 && lucky_ball_match == true) {
+        payout = 4;
+    } else if (num_matches == 1 && lucky_ball_match == true) {
+        payout = 6;
+    } else if (num_matches == 2 && lucky_ball_match == false) {
+        payout = 3;
+    } else if (num_matches == 2 && lucky_ball_match == true) {
+        payout = 25;
+    } else if (num_matches == 3 && lucky_ball_match == false) {
+        payout = 20;
+    } else if (num_matches == 3 && lucky_ball_match == true) {
+        payout = 150;
+    } else if (num_matches == 4 && lucky_ball_match == false) {
+        payout = 200;
+    } else if (num_matches == 4 && lucky_ball_match == true) {
+        payout = 5000;
+    } else if (num_matches == 5 && lucky_ball_match == false) {
+        payout = 25000;
+    } else if (num_matches == 5 && lucky_ball_match == true) {
+        payout = 7000;
+    }
+
+    /* print the payout */
+    if (payout == 7000) {
+        document.getElementById("payout").innerHTML = "Payout: $" + payout + " a WEEK for LIFE";
+    } else if (payout == 25000) {
+        document.getElementById("payout").innerHTML = "Payout: $" + payout + " a YEAR for LIFE";
+    } else {
+        document.getElementById("payout").innerHTML = "Payout: $" + payout;  
+    }
+}
+
+</script>
+</html>
